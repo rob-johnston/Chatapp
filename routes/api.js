@@ -10,5 +10,11 @@ router.get('/testEndpoint',function(req,res){
 });
 
 
+router.post('/auth',function(req,res){
+   console.log(req.body.username);
+   console.log(req.body.password);
+   res.send(JSON.stringify({result : 'great success'}));
+})
+
 
 module.exports = router;

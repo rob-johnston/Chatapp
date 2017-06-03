@@ -5,6 +5,12 @@ let io = require('socket.io')(http);
 let path = require('path');
 let index = require(path.join(__dirname,'routes','index.js'));
 let socketActions = require(path.join(__dirname,'routes','socketIO.js'));
+let bodyParser = require('body-parser');
+
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
 
 
 //static resource path
@@ -21,6 +27,7 @@ app.use('/', index);
 
 //include out socket actions
 socketActions(io);
+
 
 
 http.listen(3000, function(){
