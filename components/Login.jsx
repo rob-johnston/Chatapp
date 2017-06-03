@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
-import {Link} from 'react-router-dom';
+import {Link, withRouter} from 'react-router-dom';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 
+
+
 class Login extends React.Component {
 
-    constructor(){
+    constructor(props){
+        console.log(props);
         super();
 
         this.state = {
             username: '',
             password: '',
             loginURL: '/api/auth',
-            errorState: false
+            errorState: false,
+            router : props.router
         }
 
     }
@@ -27,7 +31,8 @@ class Login extends React.Component {
 
 
     //make api auth call and store resulting web token if successful
-    onSubmit = () => {
+    onSubmit = (e) => {
+        e.preventDefault();
         this.signIn();
     }
 
@@ -46,8 +51,12 @@ class Login extends React.Component {
         .then((response) => response.json())
         .then((responseJson) => {
             console.log(responseJson);
+
             //if successful assign user and token
             //navigate to chat page
+
+            this.props.history.push('/chat');
+
 
         })
         .catch((err) => {
@@ -90,4 +99,4 @@ class Login extends React.Component {
     }
 }
 
-export default Login;
+export default withRouter(Login);

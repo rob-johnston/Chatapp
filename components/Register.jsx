@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import {Link} from 'react-router-dom'
+import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+
 class Register extends React.Component {
 
     constructor(){
@@ -78,7 +81,7 @@ class Register extends React.Component {
                     />
 
                 </form>
-                <p>already a member? Then<Link to="/register"> go to Login page </Link></p>
+                <p>already a member? Then<Link to="/login"> go to Login page </Link></p>
             </div>
 
         );

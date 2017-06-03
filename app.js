@@ -2,6 +2,7 @@ let express = require('express');
 let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
+let socketioJwt = require('socketio-jwt');
 let path = require('path');
 let index = require(path.join(__dirname,'routes','index.js'));
 let socketActions = require(path.join(__dirname,'routes','socketIO.js'));
@@ -26,7 +27,7 @@ app.get('/', function(req, res){
 app.use('/', index);
 
 //include out socket actions
-socketActions(io);
+socketActions(io,socketioJwt);
 
 
 
