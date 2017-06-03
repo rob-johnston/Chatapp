@@ -10,7 +10,9 @@ class Login extends React.Component {
 
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loginURL: '/api/auth',
+            errorState: false
         }
 
     }
@@ -29,7 +31,7 @@ class Login extends React.Component {
         this.signIn();
     }
 
-    signIn = () => fetch('/api/auth',
+    signIn = () => fetch(this.state.loginURL,
         {
             method: 'POST',
             headers: {
@@ -49,6 +51,7 @@ class Login extends React.Component {
 
         })
         .catch((err) => {
+        //change error state, username or password dont match
             console.log(err);
         });
 
