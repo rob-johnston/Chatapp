@@ -1,12 +1,13 @@
-let express = require('express');
-let app = express();
-let http = require('http').Server(app);
-let io = require('socket.io')(http);
-let socketioJwt = require('socketio-jwt');
-let path = require('path');
-let index = require(path.join(__dirname,'routes','index.js'));
-let socketActions = require(path.join(__dirname,'routes','socketIO.js'));
-let bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const socketioJwt = require('socketio-jwt');
+const path = require('path');
+const index = require(path.join(__dirname,'routes','index.js'));
+const socketActions = require(path.join(__dirname,'routes','socketIO.js'));
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 
 
@@ -28,6 +29,10 @@ app.use('/', index);
 
 //include out socket actions
 socketActions(io,socketioJwt);
+
+//DB settings go here
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost:27017/chat');
 
 
 

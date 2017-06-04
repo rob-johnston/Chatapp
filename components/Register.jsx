@@ -12,7 +12,7 @@ class Register extends React.Component {
         this.state = {
             username: '',
             password: '',
-            registerURL :'/api/auth',
+            registerURL :'/api/register',
             errorState: false
         }
 
@@ -32,7 +32,7 @@ class Register extends React.Component {
         this.register();
     }
 
-    signIn = () => fetch(this.state.registerURL,
+    register = () => fetch(this.state.registerURL,
         {
             method: 'POST',
             headers: {

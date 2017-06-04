@@ -1,7 +1,7 @@
-let express = require('express');
-let api = require('./api');
-let path = require('path');
-let router = express.Router();
+const express = require('express');
+const api = require('./api');
+const path = require('path');
+const router = express.Router();
 
 
 //add our api endpoints

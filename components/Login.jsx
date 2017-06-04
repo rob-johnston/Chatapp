@@ -8,7 +8,6 @@ import TextField from 'material-ui/TextField';
 class Login extends React.Component {
 
     constructor(props){
-        console.log(props);
         super();
 
         this.state = {
