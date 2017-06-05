@@ -33,7 +33,7 @@ class Login extends React.Component {
     onSubmit = (e) => {
         e.preventDefault();
         this.signIn();
-    }
+    };
 
     signIn = () => fetch(this.state.loginURL,
         {
@@ -52,15 +52,22 @@ class Login extends React.Component {
             console.log(responseJson);
 
             //if successful assign user and token
-            //navigate to chat page
+            window.localStorage.setItem('ChatToken', responseJson.token);
 
-            this.props.history.push('/chat');
+            //navigate to chat page
+            this.props.history.push({
+                pathname: '/chat',
+                state : {
+                    user: responseJson.user
+                }
+            });
 
 
         })
         .catch((err) => {
         //change error state, username or password dont match
             console.log(err);
+            this.errorState=false;
         });
 
 

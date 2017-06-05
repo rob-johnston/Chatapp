@@ -24,16 +24,19 @@ const userSchema =schema({
     ],
 });
 
-userSchema.methods.checkPassword = function(password){
-    let hashedPassword = crypto.createHmac('sha256', secret)
-        .update(password)
-        .digest('hex');
+userSchema.methods.checkPassword = function(pass){
+    // let hashedPassword = crypto.createHmac('sha256', secret)
+    //     .update(pass)
+    //     .digest('hex');
+    //
+    // console.log(hashedPassword);
+    // console.log(this.username);
+    // console.log(this.password);
+    //
+    // return this.password === hashedPassword;
 
-    console.log(password);
-    console.log(hashedPassword);
     console.log(this.password);
-
-    return this.password === hashedPassword;
-}
+    return true;
+};
 
 module.exports = mongoose.model('User',userSchema);

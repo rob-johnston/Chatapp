@@ -8,6 +8,7 @@ const index = require(path.join(__dirname,'routes','index.js'));
 const socketActions = require(path.join(__dirname,'routes','socketIO.js'));
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const initialisation = require('./routes/initialisation');
 
 
 
@@ -34,6 +35,8 @@ socketActions(io,socketioJwt);
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost:27017/chat');
 
+//setup default info
+initialisation();
 
 
 http.listen(3000, function(){
