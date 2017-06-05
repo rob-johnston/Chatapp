@@ -3,6 +3,7 @@ import io from 'socket.io-client'
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
+import MessageList from './MessageList.jsx';
 
 const baseJSON = {
     method: 'GET',
@@ -28,7 +29,8 @@ class Chat extends React.Component {
             users: {},
             currentChannel: 'default',
             messages : [],
-            socket : {}
+            socket : {},
+            test : ''
         };
 
         // get information for signed in user
@@ -52,7 +54,8 @@ class Chat extends React.Component {
 
     receiveMessage = (msg) => {
         console.log(msg);
-        this.state.messages.push(msg);
+        this.state.messages.push(JSON.parse(msg));
+        this.setState({test : ''});
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)
@@ -90,6 +93,9 @@ class Chat extends React.Component {
     };
 
     sendMessage = () => {
+        if(this.state.input.length<1){
+            return;
+        }
         let message = {
             text : this.state.input,
             timestamp : Date.now(),
@@ -98,6 +104,7 @@ class Chat extends React.Component {
         };
 
         this.socket.emit('message', JSON.stringify(message));
+        this.state.messages.push(message);
         this.setState({input : ''});
     };
 
@@ -118,6 +125,7 @@ class Chat extends React.Component {
         });
 
 
+
     render(){
         return (
                 <div>
@@ -127,6 +135,9 @@ class Chat extends React.Component {
                         user = {this.state.username}
                         activeChannel = {this.state.currentChannel}
                     />
+                   <MessageList
+                       messages = {this.state.messages}
+                   />
                     <form onSubmit={this.sendMessage}>
                         <TextField
                             id="input"
