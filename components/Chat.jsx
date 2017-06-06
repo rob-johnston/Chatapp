@@ -4,7 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx';
-import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed'
+
 
 const baseJSON = {
     method: 'GET',
@@ -51,7 +51,6 @@ class Chat extends React.Component {
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
-        this.textInput.focus();
     };
 
     receiveMessage = (msg) => {
@@ -59,6 +58,7 @@ class Chat extends React.Component {
         let msgs = this.state.messages;
         msgs.push(JSON.parse(msg));
         this.setState({messages : msgs});
+        document.body.scrollTop = document.body.scrollHeight;
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)
@@ -111,8 +111,8 @@ class Chat extends React.Component {
         let msgs = this.state.messages;
         msgs.push(message);
         this.setState({messages : msgs, input : ''});
-        this.textInput.focus();
-
+        console.log('try to scroll window');
+        window.scrollTo(0,document.body.scrollHeight);
     };
 
     changeActiveRoom = () => {
@@ -130,6 +130,10 @@ class Chat extends React.Component {
         .catch((err) => {
             console.log(err);
         });
+
+    componentDidUpdate = () => {
+        console.log('chat update');
+    };
 
 
     render(){

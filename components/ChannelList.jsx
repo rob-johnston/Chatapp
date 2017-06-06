@@ -25,6 +25,7 @@ class ChannelList extends React.Component {
 
         );
     }
+
 }
 
 export default ChannelList;
