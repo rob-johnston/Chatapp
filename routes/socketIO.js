@@ -1,4 +1,4 @@
-
+const models  = require('../models');
 
 module.exports = function(io,ioJwt){
 
@@ -20,7 +20,14 @@ module.exports = function(io,ioJwt){
 
         socket.on('message', function(msg){
             let parsedMsg = JSON.parse(msg);
-            console.log(parsedMsg);
+            let messageToSave = new models.Message(parsedMsg);
+
+            messageToSave.save().then((e) => {
+                    console.log(e)
+            })
+            .catch((err) =>{
+                console.log(err);
+            });
             socket.broadcast.to(parsedMsg.channel).emit('chatmessage', msg);
         });
 
