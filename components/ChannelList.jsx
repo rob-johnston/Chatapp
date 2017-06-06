@@ -16,7 +16,7 @@ class ChannelList extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="channelList">
                 <p>ChannelList component</p>
                 <div>
                     {this.renderChannelList()}

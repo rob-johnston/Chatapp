@@ -6,21 +6,31 @@ class MessageList extends React.Component {
         super(props);
     }
 
+    componentDidUpdate = () => {
+        this.textInput.focus();
+    };
+
     renderMessageList = () => this.props.messages.map((message) => {
         return (
-            <div className="individualMessage" key = {message.timestamp}>
-                <p>{message.user}</p>
-                <p>{message.text}</p>
-            </div>
+            <li>
+                <div className="individualMessage" key = {message.timestamp}>
+                    <p>{message.user}</p>
+                    <p>{message.text}</p>
+                </div>
+            </li>
         );
     });
 
     render() {
         return (
-            <div>
+            <div className="messageList" ref={(list) => {this.list = list}}>
                 <p>MessageList component</p>
                 <div>
+                    <ul>
                     {this.renderMessageList()}
+                    </ul>
+                </div>
+                <div ref={(input) => {this.textInput = input}}>
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx';
+import scrollIntoViewIfNeeded from 'scroll-into-view-if-needed'
 
 const baseJSON = {
     method: 'GET',
@@ -50,12 +51,14 @@ class Chat extends React.Component {
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
+        this.textInput.focus();
     };
 
     receiveMessage = (msg) => {
         console.log(msg);
-        this.state.messages.push(JSON.parse(msg));
-        this.setState({test : ''});
+        let msgs = this.state.messages;
+        msgs.push(JSON.parse(msg));
+        this.setState({messages : msgs});
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)
@@ -85,7 +88,7 @@ class Chat extends React.Component {
 
     joinRoom = (room) => {
         this.socket.emit('joinRoom', room);
-    }
+    };
 
 
     leaveRoom = (room) => {
@@ -104,8 +107,12 @@ class Chat extends React.Component {
         };
 
         this.socket.emit('message', JSON.stringify(message));
-        this.state.messages.push(message);
-        this.setState({input : ''});
+
+        let msgs = this.state.messages;
+        msgs.push(message);
+        this.setState({messages : msgs, input : ''});
+        this.textInput.focus();
+
     };
 
     changeActiveRoom = () => {
@@ -125,31 +132,36 @@ class Chat extends React.Component {
         });
 
 
-
     render(){
         return (
-                <div>
-                    <p>Chat component</p>
-                    <ChannelList
-                        channels = {this.state.channels}
-                        user = {this.state.username}
-                        activeChannel = {this.state.currentChannel}
-                    />
-                   <MessageList
-                       messages = {this.state.messages}
-                   />
-                    <form onSubmit={this.sendMessage}>
-                        <TextField
-                            id="input"
-                            value={this.state.input}
-                            label="input"
-                            onChange={this.onChangeInput}
+                <div className="chatApp">
+                    <div className="leftPane">
+                        <ChannelList
+                            channels = {this.state.channels}
+                            user = {this.state.username}
+                            activeChannel = {this.state.currentChannel}
                         />
-                        <RaisedButton
-                            type="submit"
-                            label="send"
-                         />
-                    </form>
+                    </div>
+                    <div className="rightPane">
+                        <MessageList
+                            messages = {this.state.messages}
+                        />
+                        <div className="inputArea">
+                            <form onSubmit={this.sendMessage}>
+                                <TextField
+                                    id="input"
+                                    value={this.state.input}
+                                    label="input"
+                                    onChange={this.onChangeInput}
+                                    style={{width:500}}
+                                />
+                                <RaisedButton
+                                    type="submit"
+                                    label="send"
+                                 />
+                            </form>
+                        </div>
+                    </div>
                 </div>
         );
     }

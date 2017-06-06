@@ -1,0 +1,38 @@
+.chatApp {
+    font-family: 'Roboto', sans-serif;
+}
+
+
+.leftPane {
+    position: fixed;
+    float: left;
+    width: 30%;
+    height: 100%;
+}
+
+.rightPane {
+    float: right;
+    width: 70%;
+    height: 100%;
+}
+
+.messageList li{
+    list-style-type: none;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.messageList {
+    max-height : 90vh;
+    overflow:auto;
+}
+
+
+.inputArea {
+    position: fixed;
+    bottom: 0px;
+    margin-right: auto;
+    margin-left: auto;
+    background: #ececec;
+}
+

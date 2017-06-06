@@ -12,7 +12,6 @@ class Container extends Component {
     render() {
         return (
            <div>
-                <p>Hi im a container</p>
             </div>
         );
     }
