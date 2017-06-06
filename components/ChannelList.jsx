@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import FlatButton from 'material-ui/FlatButton'
 
 class ChannelList extends React.Component {
 
@@ -6,10 +7,21 @@ class ChannelList extends React.Component {
         super(props);
     }
 
+    handleSelectChannelClick = (e) => {
+        e.preventDefault();
+        console.log("link clicked");
+    };
+
+
+
     renderChannelList = () => this.props.channels.map((channel) => {
         return (
             <div key = {channel.name}>
-                <p>{channel.name}</p>
+                <li>
+                    <a href="#" onClick={this.handleSelectChannelClick}>
+                        #{channel.name}
+                    </a>
+                </li>
             </div>
         );
     });
@@ -17,15 +29,27 @@ class ChannelList extends React.Component {
     render() {
         return (
             <div className="channelList">
-                <p>ChannelList component</p>
+                <div className="channelListHeader">
+                    <div className="channelListHeaderTitle">
+                        <h4>Channels</h4>
+                    </div>
+                    <div className="channelListHeaderButton">
+                        <FlatButton
+                            id="addChannelButton"
+                            label="+"
+                            type="submit"
+                        />
+                    </div>
+                </div>
                 <div>
-                    {this.renderChannelList()}
+                    <ul>
+                        {this.renderChannelList()}
+                    </ul>
                 </div>
             </div>
 
         );
     }
-
 }
 
 export default ChannelList;

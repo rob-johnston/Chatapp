@@ -12,8 +12,6 @@ module.exports = function(io,ioJwt){
     io.on('connection', function(socket){
 
         console.log("a user connected");
-       // console.log("testing.. ", socket.decoded_token.name );
-
         socket.on('disconnect',function(){
             console.log("user disconnected");
         });
@@ -21,7 +19,6 @@ module.exports = function(io,ioJwt){
         socket.on('message', function(msg){
             let parsedMsg = JSON.parse(msg);
             let messageToSave = new models.Message(parsedMsg);
-
             messageToSave.save().then((e) => {
                     console.log(e)
             })
@@ -31,9 +28,14 @@ module.exports = function(io,ioJwt){
             socket.broadcast.to(parsedMsg.channel).emit('chatmessage', msg);
         });
 
+
         socket.on('joinRoom',function(room){
             socket.join(room);
         });
+
+        socket.on('leaveRoom',function (room) {
+            socket.leave(room);
+        })
 
 
 

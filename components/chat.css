@@ -2,11 +2,26 @@
     font-family: 'Roboto', sans-serif;
 }
 
+.channelList{
+    background: #4a3748;
+    height:100%;
+    color : #90658e;
+    position:relative;
+}
+
+.channelListHeaderTitle{
+}
+
+.channelListHeaderButton{
+    float: left;
+}
+
 
 .leftPane {
     position: fixed;
     float: left;
-    width: 30%;
+    max-width: 200px;
+    min-width: 200px;
     height: 100%;
 }
 
@@ -14,6 +29,10 @@
     float: right;
     width: 70%;
     height: 100%;
+}
+
+.channelList li{
+    list-style-type:none;
 }
 
 .messageList li{
@@ -30,9 +49,22 @@
 
 .inputArea {
     position: fixed;
-    bottom: 0px;
+    bottom: 10px;
     margin-right: auto;
     margin-left: auto;
     background: #ececec;
+
 }
 
+
+.individualMessage {
+    word-wrap: break-word;
+    max-width: 80%;
+    background: #efefef;
+
+}
+
+.individualMessage .sender{
+    font-weight: bold;
+    font-size: 15px;
+}

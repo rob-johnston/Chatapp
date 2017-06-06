@@ -6,6 +6,7 @@ import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx';
 
 
+
 const baseJSON = {
     method: 'GET',
     headers: {
@@ -54,11 +55,17 @@ class Chat extends React.Component {
     };
 
     receiveMessage = (msg) => {
-        console.log(msg);
         let msgs = this.state.messages;
-        msgs.push(JSON.parse(msg));
-        this.setState({messages : msgs});
-        document.body.scrollTop = document.body.scrollHeight;
+        if(JSON.parse(msg).channel === this.state.currentChannel){
+            msgs.push(JSON.parse(msg));
+            this.setState({messages : msgs});
+            document.body.scrollTop = document.body.scrollHeight;
+        } else {
+
+            //deal with a message for a room we arent current viewing
+
+        }
+
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)

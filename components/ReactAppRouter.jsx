@@ -9,7 +9,6 @@ import MultiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 class ReactAppRouter extends Component {
 
     render() {
-
         return (
             <MultiThemeProvider>
                 <Router>
