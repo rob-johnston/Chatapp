@@ -126,5 +126,11 @@ router.get('/users/:username', (req, res) => {
         });
 });
 
+router.get('/decodeToken',function(req,res){
+    let token = authentication.decodeToken(req.headers.token);
+    res.json(token);
+});
+
+
 
 module.exports = router;

@@ -3,7 +3,8 @@ import io from 'socket.io-client'
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
-import MessageList from './MessageList.jsx';
+import MessageList from './MessageList.jsx'
+import {withRouter} from 'react-router-dom';
 
 
 
@@ -46,9 +47,28 @@ class Chat extends React.Component {
         this.socket.on('chatmessage', this.receiveMessage);
     }
 
+    componentWillMount = () => {
+        //if theres a token but no user..
+        if(this.props.location.state==undefined && window.localStorage.getItem('ClubToken')){
+            this.extractUsernameFromToken();
+        }
+    }
+
+    extractUsernameFromToken = () => fetch('/api/decodeToken',baseJSON)
+        .then((res) =>{
+            this.state.username=res.username;
+         })
+        .catch((err) =>{
+            console.log(err);
+        });
 
     componentDidMount = () => {
-        this.getUserInfo(this.props.location.state.user.username);
+        if(this.props.location.state){
+            this.getUserInfo(this.props.location.state.user.username);
+        } else if (this.state.username){
+            this.getUserInfo(this.state.username);
+        }
+
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
@@ -178,4 +198,4 @@ class Chat extends React.Component {
     }
 }
 
-export default Chat;
+export default withRouter(Chat);

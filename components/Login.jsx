@@ -22,11 +22,11 @@ class Login extends React.Component {
 
     onChangeUsername = (event) => {
         this.setState({username : event.target.value});
-    }
+    };
 
     onChangePassword = (event) => {
         this.setState({password : event.target.value});
-    }
+    };
 
 
     //make api auth call and store resulting web token if successful
@@ -61,18 +61,12 @@ class Login extends React.Component {
                     user: responseJson.user
                 }
             });
-
-
         })
         .catch((err) => {
         //change error state, username or password dont match
             console.log(err);
             this.errorState=false;
         });
-
-
-
-
 
 
 

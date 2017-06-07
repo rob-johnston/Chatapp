@@ -30,7 +30,7 @@ class Register extends React.Component {
     //make api auth call and store resulting web token if successful
     onSubmit = () => {
         this.register();
-    }
+    };
 
     register = () => fetch(this.state.registerURL,
         {
