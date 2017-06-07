@@ -13,7 +13,7 @@ const baseJSON = {
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Token' : JSON.stringify( { token : window.localStorage.getItem('ChatToken') })
+        'token' :  window.localStorage.getItem('ChatToken')
     }
 };
 
@@ -47,28 +47,26 @@ class Chat extends React.Component {
         this.socket.on('chatmessage', this.receiveMessage);
     }
 
-    componentWillMount = () => {
-        //if theres a token but no user..
-        if(this.props.location.state==undefined && window.localStorage.getItem('ClubToken')){
+    componentWillMount = () =>{
+      //check user is defined
+        if(typeof this.props.location.state != 'undefined'){
+            this.setState({username : this.props.location.state.user.username});
+        } else if(typeof window.localStorage.getItem('ChatToken') != 'undefined'){
             this.extractUsernameFromToken();
         }
-    }
+    };
 
     extractUsernameFromToken = () => fetch('/api/decodeToken',baseJSON)
-        .then((res) =>{
-            this.state.username=res.username;
-         })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            this.setState({username : responseJson.username});
+        })
         .catch((err) =>{
             console.log(err);
         });
 
     componentDidMount = () => {
-        if(this.props.location.state){
-            this.getUserInfo(this.props.location.state.user.username);
-        } else if (this.state.username){
-            this.getUserInfo(this.state.username);
-        }
-
+        this.getUserInfo(this.state.username);
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
@@ -123,6 +121,11 @@ class Chat extends React.Component {
     };
 
     sendMessage = () => {
+
+        console.log(this.state);
+        console.log(this.props);
+
+
         if(this.state.input.length<1){
             return;
         }
@@ -152,7 +155,6 @@ class Chat extends React.Component {
         .then((response) => response.json())
         .then((responseJson) => {
             this.setState({user : responseJson});
-            this.setState({username : responseJson.username});
         })
         .catch((err) => {
             console.log(err);

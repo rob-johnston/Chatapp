@@ -126,8 +126,10 @@ router.get('/users/:username', (req, res) => {
         });
 });
 
-router.get('/decodeToken',function(req,res){
+router.get('/decodeToken',(req,res) => {
+    console.log(req.headers.token);
     let token = authentication.decodeToken(req.headers.token);
+    console.log(token);
     res.json(token);
 });
 
