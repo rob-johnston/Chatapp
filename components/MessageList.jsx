@@ -5,6 +5,7 @@ class MessageList extends React.Component {
 
     constructor(props){
         super(props);
+
     }
 
     componentDidUpdate = () => {
@@ -23,11 +24,12 @@ class MessageList extends React.Component {
 
     renderMessageList = () => this.props.messages.map((message,index) => {
 
+
         //if previous message is from same sender dont render the name
         if(index>0 && this.props.messages[index-1].user === message.user){
             return (
-                <div className="individualMessage" key={message.timestamp}>
-                    <li key={message.timestamp}>
+                <div className="individualMessage" key={index}>
+                    <li>
                         <div className ="messageLine">
                             <div className="timeStamp">
                                 <p>{message.timestamp}</p>
@@ -41,8 +43,8 @@ class MessageList extends React.Component {
             );
         } else {
             return (
-                <div className="individualMessage" key={message.timestamp}>
-                    <li key={message.timestamp}>
+                <div className="individualMessage" key={index}>
+                    <li>
                         <div className="sender">
                             <p>{message.user}</p>
                         </div>
@@ -63,7 +65,7 @@ class MessageList extends React.Component {
     render() {
         return (
             <div className="messageList" ref={(list) => {this.list = list}} id="messageList">
-                <p>MessageList component</p>
+                <p>{this.props.channel}</p>
                 <div>
                     <ul>
                     {this.renderMessageList()}

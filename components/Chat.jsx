@@ -5,6 +5,7 @@ import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx'
 import {withRouter} from 'react-router-dom';
+import Styles from 'material-ui/styles/colors';
 
 
 
@@ -28,8 +29,8 @@ class Chat extends React.Component {
             username: '',
             user : {},
             input: '',
-            channels: [],
-            users: {},
+            channels: ['default'],
+            users: [],
             currentChannel: 'default',
             messages : [],
             socket : {},
@@ -45,31 +46,58 @@ class Chat extends React.Component {
         this.socket.on('join', this.joinRoom);
         this.socket.on('sendMessage', this.sendMessage);
         this.socket.on('chatmessage', this.receiveMessage);
+        this.socket.on('joinedNewRoom', this.handleJoinRoomEvent);
+
     }
 
-    componentWillMount = () =>{
-      //check user is defined
-        if(typeof this.props.location.state != 'undefined'){
-            this.setState({username : this.props.location.state.user.username});
-        } else if(typeof window.localStorage.getItem('ChatToken') != 'undefined'){
-            this.extractUsernameFromToken();
+
+    handleJoinRoomEvent = (room) => {
+        //add room to users list of rooms
+        let info = JSON.parse(room);
+        let newChannels = this.state.channels;
+        console.log(newChannels);
+        if(newChannels.indexOf(info.room)<0){
+            newChannels.push(info.room);
+            this.setState({channels : newChannels});
         }
+        this.getMessages(info.room);
+        this.getChannels();
+
+
     };
+
+
+
 
     extractUsernameFromToken = () => fetch('/api/decodeToken',baseJSON)
         .then((response) => response.json())
         .then((responseJson) => {
             this.setState({username : responseJson.username});
+            //finish calls to set up
+            this.initialisationMethods();
         })
         .catch((err) =>{
             console.log(err);
         });
 
-    componentDidMount = () => {
+
+    initialisationMethods = () => {
         this.getUserInfo(this.state.username);
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
+    };
+
+    componentDidMount = () => {
+        //check user is defined
+        if(typeof this.props.location.state != 'undefined'){
+            let user = this.props.location.state.user.username;
+            this.setState({username : user},function(){
+                this.initialisationMethods();
+            });
+        } else if(typeof window.localStorage.getItem('ChatToken') != 'undefined'){
+            this.extractUsernameFromToken();
+        }
     };
 
     receiveMessage = (msg) => {
@@ -79,16 +107,14 @@ class Chat extends React.Component {
             this.setState({messages : msgs});
             document.body.scrollTop = document.body.scrollHeight;
         } else {
-
             //deal with a message for a room we arent current viewing
-
         }
-
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)
             .then((response) => response.json())
             .then((responseJson) => {
+                console.log(responseJson);
                 this.setState({channels : responseJson});
             })
             .catch((err) => {
@@ -110,9 +136,12 @@ class Chat extends React.Component {
             console.log(err);
         });
 
-
     joinRoom = (room) => {
-        this.socket.emit('joinRoom', room);
+        let info = JSON.stringify({
+            username: this.state.username,
+            room: room
+        });
+        this.socket.emit('joinRoom', info);
     };
 
 
@@ -137,14 +166,18 @@ class Chat extends React.Component {
         let msgs = this.state.messages;
         msgs.push(message);
         this.setState({messages : msgs, input : ''});
-        console.log('try to scroll window');
         window.scrollTo(0,document.body.scrollHeight);
     };
 
-    changeActiveRoom = () => {
-
-        //change room locally,
-        //pull in new messages
+    changeActiveRoom = (e) => {
+        e.preventDefault();
+        let channelTarget = e.target.innerText.substring(1,e.target.innerText.length);
+        if(channelTarget===this.state.currentChannel){
+            return;
+        }
+        //change room locally
+        this.setState({currentChannel : channelTarget});
+        this.joinRoom(channelTarget);
     };
 
     getUserInfo = (user) => fetch('/api/users/' + user, baseJSON)
@@ -157,9 +190,13 @@ class Chat extends React.Component {
         });
 
     componentDidUpdate = () => {
-        console.log('chat update');
     };
 
+    addChannel = (form) => {
+        //broadcast join to new channel
+        this.joinRoom(form.target.input.value);
+        this.setState({currentChannel : form.target.input.value});
+    };
 
     render(){
         return (
@@ -169,10 +206,14 @@ class Chat extends React.Component {
                             channels = {this.state.channels}
                             user = {this.state.username}
                             activeChannel = {this.state.currentChannel}
+                            setChannel = {this.changeActiveRoom}
+                            addChannel = {this.addChannel}
+                            joinRoom = {this.joinRoom}
                         />
                     </div>
                     <div className="rightPane">
                         <MessageList
+                            channel = {this.state.currentChannel}
                             messages = {this.state.messages}
                         />
                         <div className="inputArea">

@@ -9,10 +9,24 @@
     position:relative;
 }
 
-.channelListHeaderTitle{
+.activeChannelListItem {
+    background: teal;
+    color : white;
+    width : 90%;
+}
+.activeChannelListItem a{
+    color : white;
+    text-decoration: none;
+}
+
+
+a{
+    color: #90658e;
+    text-decoration: none;
 }
 
 .channelListHeaderButton{
+    margin-left:10px;
     float: left;
 }
 
@@ -41,7 +55,6 @@
     list-style-type: none;
     display: flex;
     flex-direction: column;
-    line-height:1px;
 }
 
 .messageList {
@@ -61,13 +74,13 @@
 
 .individualMessage {
     max-width: 80%;
-    background: #efefef;
-    line-height:1px;
+    background: white;
 }
 
 .individualMessage .messageText {
+    float:right;
     word-wrap: break-word;
-    width : 100%;
+    width : 70%;
 }
 
 

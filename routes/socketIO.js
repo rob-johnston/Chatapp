@@ -30,11 +30,38 @@ module.exports = function(io,ioJwt){
 
 
         socket.on('joinRoom',function(room){
-            socket.join(room);
+            console.log("join room socket received");
+            let info = JSON.parse(room);
+            console.log(info);
+            socket.join(info.room);
+            socket.emit('joinedNewRoom', room);
+
+            //on mongoose add channel to User, using User
+            models.User.findOne({username : info.username})
+                .then((user) =>{
+                    user.addChannel(info.room);
+                    return user.save()
+                })
+                .then((result)=>{
+                    console.log(result);
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+
+            //create new Channel in DB
+            let newChannel = new models.Channel({name : info.room});
+            newChannel.save()
+                .catch((err) =>{
+                    console.log(err);
+                });
+
+
         });
 
         socket.on('leaveRoom',function (room) {
             socket.leave(room);
+            //remove from models
         })
 
 
