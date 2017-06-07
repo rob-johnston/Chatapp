@@ -36,9 +36,12 @@
 }
 
 .messageList li{
+    word-wrap:break-word;
+    width : 100%;
     list-style-type: none;
     display: flex;
-    flex-direction: column-reverse;
+    flex-direction: column;
+    line-height:1px;
 }
 
 .messageList {
@@ -53,19 +56,33 @@
     margin-right: auto;
     margin-left: auto;
     background: #ececec;
-
 }
 
 
 .individualMessage {
-    word-wrap: break-word;
     max-width: 80%;
     background: #efefef;
-    line-height:5px;
+    line-height:1px;
+}
 
+.individualMessage .messageText {
+    word-wrap: break-word;
+    width : 100%;
+}
+
+
+.individualMessage .timeStamp {
+    font-size: 10px;
+    float: left;
+    width: 20%;
 }
 
 .individualMessage .sender{
     font-weight: bold;
-    font-size: 15px;
+    font-size: 18px;
+    float: left;
+}
+
+.messageLine {
+    display: inline-block;
 }

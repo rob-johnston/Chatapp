@@ -122,16 +122,12 @@ class Chat extends React.Component {
 
     sendMessage = () => {
 
-        console.log(this.state);
-        console.log(this.props);
-
-
         if(this.state.input.length<1){
             return;
         }
         let message = {
             text : this.state.input,
-            timestamp : Date.now(),
+            timestamp : new Date().toString(),
             user : this.state.username,
             channel : this.state.currentChannel
         };
