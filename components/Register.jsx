@@ -20,11 +20,11 @@ class Register extends React.Component {
 
     onChangeUsername = (event) => {
         this.setState({username : event.target.value});
-    }
+    };
 
     onChangePassword = (event) => {
         this.setState({password : event.target.value});
-    }
+    };
 
 
     //make api auth call and store resulting web token if successful

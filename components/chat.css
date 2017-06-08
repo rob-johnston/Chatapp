@@ -112,3 +112,24 @@ a{
 .messageLine {
     display: inline-block;
 }
+
+
+.individualUserSelected {
+    background: teal;
+    color : white;
+    width : 90%;
+}
+.individualUserSelected a{
+    color : white;
+    text-decoration: none;
+}
+
+.individualUser{
+    background: #4a3748;
+    color : #90658e;
+    width : 90%;
+}
+.individualUser a{
+    color : #90658e;
+    text-decoration: none;
+}

@@ -1,6 +1,6 @@
-const models  = require('../models');
+const models = require('../models');
 
-module.exports = function(io,ioJwt){
+module.exports = function (io, ioJwt) {
 
     //socket authentication
     io.use(ioJwt.authorize({
@@ -9,35 +9,35 @@ module.exports = function(io,ioJwt){
     }));
 
     //describing what to do on socket actions
-    io.on('connection', function(socket){
+    io.on('connection', function (socket) {
         console.log('user connected');
 
         socket.broadcast.emit('updateUsers');
 
-        socket.on('disconnect',function(){
-            console.log("user disconnected");
+        socket.on('disconnect', function () {
+            socket.broadcast.emit('updateUsers');
         });
 
-        socket.on('message', function(msg){
+        socket.on('message', function (msg) {
             let parsedMsg = JSON.parse(msg);
             let messageToSave = new models.Message(parsedMsg);
             messageToSave.save().then((e) => {
             })
-            .catch((err) =>{
-                console.log(err);
-            });
+                .catch((err) => {
+                    console.log(err);
+                });
             socket.broadcast.to(parsedMsg.channel).emit('chatmessage', msg);
         });
 
 
-        socket.on('joinRoom',function(room){
+        socket.on('joinRoom', function (room) {
             let info = JSON.parse(room);
             socket.join(info.room);
             socket.emit('joinedNewRoom', room);
 
             //on mongoose add channel to User, using User
-            models.User.findOne({username : info.username})
-                .then((user) =>{
+            models.User.findOne({username: info.username})
+                .then((user) => {
                     user.addChannel(info.room);
                     return user.save()
                 })
@@ -46,31 +46,32 @@ module.exports = function(io,ioJwt){
                 });
 
             //create new Channel in DB - catch error if already exists
-            let newChannel = new models.Channel({name : info.room});
+            let newChannel = new models.Channel({name: info.room});
             newChannel.save()
-                .catch((err) =>{
-                    console.log('Channel Exists');
+                .catch((err) => {
+                    //console.log("channel already exists");
                 });
 
+            socket.broadcast.emit('refreshChannels');
 
         });
 
-        socket.on('leaveRoom',function (room) {
+        socket.on('leaveRoom', function (room) {
             socket.leave(room);
             //remove from models
         });
 
-        socket.on('deleteMessage', function(messageID){
+        socket.on('deleteMessage', function (messageID) {
 
-            models.Message.findOne({_id : messageID})
+            models.Message.findOne({_id: messageID})
                 .then((msg) => {
-                    if (msg.user === socket.decoded_token.username){
+                    if (msg.user === socket.decoded_token.username) {
                         return;
                     }
                 });
 
-            models.Message.findOneAndRemove({_id : messageID})
-                .then((removed) =>{
+            models.Message.findOneAndRemove({_id: messageID})
+                .then((removed) => {
                     io.in(removed.channel).emit('updateMessages', removed.channel);
                 })
                 .catch((err) => {
@@ -78,8 +79,8 @@ module.exports = function(io,ioJwt){
                 });
         });
 
-        socket.on('editMessage', function(messageID){
-            models.Message.findOne({_id : messageID, username : socket.decoded_token.username})
+        socket.on('editMessage', function (messageID) {
+            models.Message.findOne({_id: messageID, username: socket.decoded_token.username})
                 .then((msg) => {
                     //edit message
 
@@ -90,15 +91,15 @@ module.exports = function(io,ioJwt){
                 })
         });
 
-        socket.on('privateMessage',function(message){
+        socket.on('privateMessage', function (message) {
 
             let parsedMessage = JSON.parse(message);
 
-            Object.keys(io.sockets.connected).forEach(function(socket) {
+            Object.keys(io.sockets.connected).forEach(function (socket) {
                 let socketUser = io.sockets.connected[socket].decoded_token.username;
-                if( parsedMessage.user === socketUser){
+                if (parsedMessage.user === socketUser) {
                     io.sockets.connected[socket].emit('privateMessage', message);
-                } else if( parsedMessage.target === socketUser){
+                } else if (parsedMessage.target === socketUser) {
                     io.sockets.connected[socket].emit('privateMessage', message);
                 }
                 // socketId
@@ -109,8 +110,6 @@ module.exports = function(io,ioJwt){
             //loop through and broadcast to correct people
 
         });
-
-
 
 
     });

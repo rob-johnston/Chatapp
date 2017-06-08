@@ -8,7 +8,17 @@ class UserList extends React.Component {
     }
 
     renderUserList = () => this.props.users.map((user,index) => {
-        //if previous message is from same sender dont render the name
+        if(user === this.props.target){
+            return (
+                <div className="individualUserSelected" key={index}>
+                    <li>
+                        <a href="#" onClick={this.props.changeToPrivateMessageView}>
+                            <p>{user}</p>
+                        </a>
+                    </li>
+                </div>
+            );
+        } else {
             return (
                 <div className="individualUser" key={index}>
                     <li>
@@ -18,6 +28,7 @@ class UserList extends React.Component {
                     </li>
                 </div>
             );
+        }
     });
 
     render() {
