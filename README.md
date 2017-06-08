@@ -16,11 +16,11 @@ Or you could change the connection line in app.js to a different address.
 `npm run`
 
 
-After that naviagate to http://localhost:3000/#/login
+After that navigate to http://localhost:3000/#/login
 default login is   username: admin  password: admin
 or register a new username and password on the register
 
-Best use is to open a seperate incognito tab and sign in with a different username, otherwise weird behaviour may occur.
+Best use is to open a separate incognito tab and sign in with a different username, otherwise weird behaviour may occur.
 
 ## Features
 
