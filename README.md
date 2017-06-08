@@ -7,13 +7,13 @@ Requires mongoDB to be running at its default location locally at mongodb://loca
 Or you could change the connection line in app.js to a different address.
 
 
-git clone https://github.com/rob-johnston/Chatapp.git
+`git clone https://github.com/rob-johnston/Chatapp.git`
 
-cd Chatapp
+`cd Chatapp`
 
-npm install
+`npm install`
 
-npm run
+`npm run`
 
 
 After that naviagate to http://localhost:3000/#/login
@@ -22,18 +22,18 @@ or register a new username and password on the register
 
 Best use is to open a seperate incognito tab and sign in with a different username, otherwise weird behaviour may occur.
 
-Features
+## Features
 
--Can Sign In and Register new users
+- Can Sign In and Register new users
 
--Can write messages in channels (chat rooms).
+- Can write messages in channels (chat rooms).
 
--Navigate Channels by clicking on them
+- Navigate Channels by clicking on them
 
--Add new channels by typing in the name and hitting ‘Add’ in the channel list
+- Add new channels by typing in the name and hitting ‘Add’ in the channel list
 
--You can delete your own messages by clicking the minus sign near the timestamp
+- You can delete your own messages by clicking the minus sign near the timestamp
 
--If you point two different users at eachother you can write private messages. These messages aren’t stored like channel messages and will dissapear if you navigate away and back.
+- If you point two different users at eachother you can write private messages. These messages aren’t stored like channel messages and will dissapear if you navigate away and back.
 
--view is updated on any major events like users signing in/out, new channels being created.
+- view is updated on any major events like users signing in/out, new channels being created.
