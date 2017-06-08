@@ -33,7 +33,7 @@ socketActions(io,socketioJwt);
 
 //DB settings go here
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/chat');
+mongoose.connect('mongodb://localhost:27017/HomelikeChatApp');
 
 //setup default info
 initialisation();
