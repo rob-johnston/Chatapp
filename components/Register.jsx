@@ -72,7 +72,7 @@ class Register extends React.Component {
                 <form onSubmit={this.onSubmit}>
                     <TextField
                         hintText="Username"
-                        value={this.username}
+                        value={this.state.username}
                         label="Username"
                         onChange={this.onChangeUsername}
                         errorText={this.state.errorState && 'Name already in use'}
