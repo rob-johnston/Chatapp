@@ -2,6 +2,9 @@
   "name": "chat-app",
   "version": "0.0.1",
   "description": "A socket chat app",
+  "scripts": {
+    "start" : "webpack && node app.js"
+  },
   "dependencies": {
     "body-parser": "^1.17.2",
     "crypto": "0.0.3",

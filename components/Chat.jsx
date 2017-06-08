@@ -4,6 +4,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx'
+import UserList from './UserList.jsx';
 import {withRouter} from 'react-router-dom';
 
 const baseJSON = {
@@ -31,7 +32,9 @@ class Chat extends React.Component {
             currentChannel: 'default',
             messages : [],
             socket : {},
-            test : ''
+            test : '',
+            privateMessage: false,
+            privateMessageTarget: ''
         };
 
         // get information for signed in user
@@ -44,12 +47,27 @@ class Chat extends React.Component {
         this.socket.on('sendMessage', this.sendMessage);
         this.socket.on('chatmessage', this.receiveMessage);
         this.socket.on('joinedNewRoom', this.handleJoinRoomEvent);
-        this.socket.on('updateMessages', this.handleUpdateMessages)
+        this.socket.on('updateMessages', this.handleUpdateMessages);
+        this.socket.on('privateMessage',this.handleReceivePrivateMessage);
+        this.socket.on('updateUsers',this.handleUpdateUsers);
 
     }
 
+    handleUpdateUsers = () => {
+      this.getUsers();
+    };
+
+    handleReceivePrivateMessage = (message) => {
+        let msg = JSON.parse(message);
+        let localTarget = this.state.privateMessageTarget;
+        if(this.state.privateMessage && (msg.target === localTarget || msg.user === localTarget)){
+            let msgs = this.state.messages;
+            msgs.push(msg);
+            this.setState({messages : msgs});
+        }
+    };
+
     handleUpdateMessages = (channel) => {
-        console.log('updating messages');
         this.getMessages(channel);
     };
 
@@ -57,7 +75,15 @@ class Chat extends React.Component {
         //add room to users list of rooms
         let info = JSON.parse(room);
         let newChannels = this.state.channels;
-        console.log(newChannels);
+        if (newChannels) {
+            if(newChannels.indexOf(info.room)<0){
+                newChannels.push(info.room);
+                this.setState({channels : newChannels});
+            }
+            this.getMessages(info.room);
+            this.getChannels();
+        }
+
         if(newChannels.indexOf(info.room)<0){
             newChannels.push(info.room);
             this.setState({channels : newChannels});
@@ -68,6 +94,10 @@ class Chat extends React.Component {
 
     };
 
+    changeToPrivateMessageView = (e) => {
+        e.preventDefault();
+        this.setState({privateMessage: true, privateMessageTarget: e.target.innerText,messages : []});
+    };
 
 
 
@@ -88,7 +118,26 @@ class Chat extends React.Component {
         this.joinRoom('default');
         this.getMessages('default');
         this.getChannels();
+        this.getUsers();
     };
+
+    getUsers = () => fetch('/api/users',baseJSON)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            console.log('loggin json');
+            console.log(responseJson)
+            let users = [];
+            responseJson.forEach(function(user){
+                    users.push(user);
+            });
+            users = users.filter(function(item,index){
+                return users.indexOf(item) == index;
+            });
+            this.setState({users:users});
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 
     componentDidMount = () => {
         //check user is defined
@@ -117,13 +166,13 @@ class Chat extends React.Component {
             document.body.scrollTop = document.body.scrollHeight;
         } else {
             //deal with a message for a room we arent current viewing
+            //could put logic for little updates and stuff here
         }
     };
 
     getChannels = () => fetch('/api/channels', baseJSON)
             .then((response) => response.json())
             .then((responseJson) => {
-                console.log(responseJson);
                 this.setState({channels : responseJson});
             })
             .catch((err) => {
@@ -163,24 +212,40 @@ class Chat extends React.Component {
         if(this.state.input.length<1){
             return;
         }
-        let message = {
-            text : this.state.input,
-            timestamp : new Date().toString(),
-            user : this.state.username,
-            channel : this.state.currentChannel
-        };
 
-        this.socket.emit('message', JSON.stringify(message));
+        if(this.state.privateMessage){
+            //handle private message
+            let message = {
+                text : this.state.input,
+                timestamp : new Date().toString(),
+                user : this.state.username,
+                channel : 'privateMessage',
+                target : this.state.privateMessageTarget
+            };
 
-        // let msgs = this.state.messages;
-        // msgs.push(message);
+            this.socket.emit('privateMessage',JSON.stringify(message));
+
+        } else {
+            //handle channel message
+            let message = {
+                text: this.state.input,
+                timestamp: new Date().toString(),
+                user: this.state.username,
+                channel: this.state.currentChannel
+            };
+
+            this.socket.emit('message', JSON.stringify(message));
+            this.getMessages(this.state.currentChannel);
+        }
+
         this.setState({input : ''});
-        this.getMessages(this.state.currentChannel);
         window.scrollTo(0,document.body.scrollHeight);
     };
 
     changeActiveRoom = (e) => {
         e.preventDefault();
+        this.setState({privateMessage : false});
+        this.setState({privateMessageTarget : ''});
         let channelTarget = e.target.innerText.substring(1,e.target.innerText.length);
         if(channelTarget===this.state.currentChannel){
             return;
@@ -218,11 +283,11 @@ class Chat extends React.Component {
 
     handleDelete = (value) => {
       value.preventDefault();
-      console.log(value.target.messageID.value);
       this.socket.emit('deleteMessage', value.target.messageID.value);
     };
 
     logout = (e) => {
+        this.socket.disconnect();
         e.preventDefault();
         window.localStorage.setItem('ChatToken',null);
         //navigate to chat page
@@ -232,7 +297,7 @@ class Chat extends React.Component {
                 username: ''
             }
         });
-    }
+    };
 
     render(){
         return (
@@ -249,6 +314,11 @@ class Chat extends React.Component {
                             addChannel = {this.addChannel}
                             joinRoom = {this.joinRoom}
                         />
+                        <UserList
+                            users = {this.state.users}
+                            changeToPrivateMessageView = {this.changeToPrivateMessageView}
+
+                            />
                     </div>
                     <div className="rightPane">
                         <MessageList
@@ -256,6 +326,8 @@ class Chat extends React.Component {
                             messages = {this.state.messages}
                             handleDelete = {this.handleDelete}
                             username = {this.state.username}
+                            privateMessage = {this.privateMessage}
+                            privateMessageTarget={this.privateMessageTarget}
                         />
                         <div className="inputArea">
                             <form onSubmit={this.sendMessage}>

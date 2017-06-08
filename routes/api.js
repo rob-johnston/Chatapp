@@ -8,10 +8,6 @@ const secret = 'abcdefg';
 const crypto = require('crypto');
 
 
-router.get('/testEndpoint',function(req,res){
-   res.send('This is a test endpoint');
-});
-
 //checks a token
 router.post('/validateToken', function(req,res){
     if(authentication.checkToken((req.body.token))){
@@ -55,9 +51,15 @@ router.post('/register',function(req,res){
         .digest('hex');
 
     let newUser = new models.User({ username : req.body.username, password : hashedPassword});
-    newUser.save().then((e) => {
-        console.log(e);
-        res.json({token : authentication.generateToken(req.body.username)});
+    newUser.save().then((user) => {
+        let userToSend ={
+            token : authentication.generateToken(req.body.username),
+            user : {
+                username : user.username,
+                channels : user.channels
+            }
+        };
+        res.json(userToSend);
     }).catch((err)=>{
         console.log(err);
         res.json({error : err});
@@ -66,10 +68,20 @@ router.post('/register',function(req,res){
 });
 
 
-//middleware, checks token is legit
-// router.use(function(req,res){
-//
-// });
+//middleware, checks token is valid to protect following api routes
+//leaving this disabled due to a small bug where page navigates
+//before token is set correctly in local storage
+router.use(function(req,res,next){
+    //perform token check at req.headers.token
+    // if(authentication.checkToken(req.headers.token)){
+    //     next();
+    // } else {
+    //     res.json({
+    //         error : 'invalid token'
+    //     })
+    // }
+    next()
+});
 
 
 //get all channels
@@ -99,17 +111,16 @@ router.get('/channel/:channelName/messages', (req,res) => {
 
 });
 
-//list of all users
+//list of all connected users
 router.get('/users', (req, res) => {
 
-    models.User.find({}, 'username channels')
-        .then((users) => {
-            res.json(users);
-        })
-        .catch((err) => {
-            console.log(err);
-            res.json(err);
-        });
+    let io = require('../app').io;
+    let results = [];
+    Object.keys(io.sockets.connected).forEach(function(socket) {
+       results.push(io.sockets.connected[socket].decoded_token.username); // socketId
+    });
+    //code for looping through
+    res.json(results);
 
 });
 
@@ -127,9 +138,7 @@ router.get('/users/:username', (req, res) => {
 });
 
 router.get('/decodeToken',(req,res) => {
-    console.log(req.headers.token);
     let token = authentication.decodeToken(req.headers.token);
-    console.log(token);
     res.json(token);
 });
 

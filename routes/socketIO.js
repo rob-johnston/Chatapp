@@ -10,21 +10,18 @@ module.exports = function(io,ioJwt){
 
     //describing what to do on socket actions
     io.on('connection', function(socket){
+        console.log('user connected');
+
+        socket.broadcast.emit('updateUsers');
 
         socket.on('disconnect',function(){
             console.log("user disconnected");
         });
 
         socket.on('message', function(msg){
-
-            Object.keys(io.sockets.connected).forEach(function(socket) {
-                console.log(io.sockets.connected[socket].decoded_token.username); // socketId
-            });
-
             let parsedMsg = JSON.parse(msg);
             let messageToSave = new models.Message(parsedMsg);
             messageToSave.save().then((e) => {
-                    console.log(e)
             })
             .catch((err) =>{
                 console.log(err);
@@ -72,11 +69,8 @@ module.exports = function(io,ioJwt){
                     }
                 });
 
-
-            console.log('delete message socket call');
             models.Message.findOneAndRemove({_id : messageID})
                 .then((removed) =>{
-                    console.log(removed);
                     io.in(removed.channel).emit('updateMessages', removed.channel);
                 })
                 .catch((err) => {
@@ -94,6 +88,26 @@ module.exports = function(io,ioJwt){
                 .catch((err) => {
                     console.log(err);
                 })
+        });
+
+        socket.on('privateMessage',function(message){
+
+            let parsedMessage = JSON.parse(message);
+
+            Object.keys(io.sockets.connected).forEach(function(socket) {
+                let socketUser = io.sockets.connected[socket].decoded_token.username;
+                if( parsedMessage.user === socketUser){
+                    io.sockets.connected[socket].emit('privateMessage', message);
+                } else if( parsedMessage.target === socketUser){
+                    io.sockets.connected[socket].emit('privateMessage', message);
+                }
+                // socketId
+            });
+
+            //could save personal message here
+
+            //loop through and broadcast to correct people
+
         });
 
 

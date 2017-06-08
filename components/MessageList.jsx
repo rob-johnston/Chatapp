@@ -15,22 +15,13 @@ class MessageList extends React.Component {
        elm.scrollTop = elm.scrollHeight;
     };
 
-    componentDidMount = () => {
-        const elm = ReactDOM.findDOMNode(this.anchorMessage);
-        if(elm) {
-            console.log('domelm found, trying to scroll');
-            elm.scrollIntoView(false);
-        }
-    }
-
-
 
     deleteButton = (message) => {
         if(this.props.username == message.user){
             return (
                 <div>
                     <form onSubmit={this.props.handleDelete} >
-                        <input name ='messageID' type="hidden" value={message._id}/>
+                        <input name ='messageID' type="hidden" value={message._id || ''}/>
                         <FlatButton
                             type="submit"
                             label="-"
