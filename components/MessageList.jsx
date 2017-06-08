@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import FlatButton from 'material-ui/FlatButton';
 
 class MessageList extends React.Component {
 
@@ -20,9 +21,29 @@ class MessageList extends React.Component {
             console.log('domelm found, trying to scroll');
             elm.scrollIntoView(false);
         }
+    }
+
+
+
+    deleteButton = (message) => {
+        if(this.props.username == message.user){
+            return (
+                <div>
+                    <form onSubmit={this.props.handleDelete} >
+                        <input name ='messageID' type="hidden" value={message._id}/>
+                        <FlatButton
+                            type="submit"
+                            label="-"
+                        />
+                    </form>
+                </div>
+            );
+        }
     };
 
+
     renderMessageList = () => this.props.messages.map((message,index) => {
+
 
 
         //if previous message is from same sender dont render the name
@@ -37,6 +58,7 @@ class MessageList extends React.Component {
                             <div className="messageText">
                                 <p>{message.text}</p>
                             </div>
+                            {this.deleteButton(message)}
                         </div>
                     </li>
                 </div>
@@ -55,6 +77,7 @@ class MessageList extends React.Component {
                             <div className="messageText">
                                 <p>{message.text}</p>
                             </div>
+                            {this.deleteButton(message)}
                         </div>
                     </li>
                 </div>

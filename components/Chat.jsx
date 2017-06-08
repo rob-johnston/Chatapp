@@ -5,9 +5,6 @@ import TextField from 'material-ui/TextField';
 import ChannelList from './ChannelList.jsx';
 import MessageList from './MessageList.jsx'
 import {withRouter} from 'react-router-dom';
-import Styles from 'material-ui/styles/colors';
-
-
 
 const baseJSON = {
     method: 'GET',
@@ -47,9 +44,14 @@ class Chat extends React.Component {
         this.socket.on('sendMessage', this.sendMessage);
         this.socket.on('chatmessage', this.receiveMessage);
         this.socket.on('joinedNewRoom', this.handleJoinRoomEvent);
+        this.socket.on('updateMessages', this.handleUpdateMessages)
 
     }
 
+    handleUpdateMessages = (channel) => {
+        console.log('updating messages');
+        this.getMessages(channel);
+    };
 
     handleJoinRoomEvent = (room) => {
         //add room to users list of rooms
@@ -95,8 +97,15 @@ class Chat extends React.Component {
             this.setState({username : user},function(){
                 this.initialisationMethods();
             });
-        } else if(typeof window.localStorage.getItem('ChatToken') != 'undefined'){
+        } else if(typeof window.localStorage.getItem('ChatToken') != 'undefined' && window.localStorage.getItem('ChatToken')!="null"){
             this.extractUsernameFromToken();
+        } else {
+            this.props.history.push({
+                pathname: '/login',
+                state : {
+                    username: ''
+                }
+            });
         }
     };
 
@@ -163,9 +172,10 @@ class Chat extends React.Component {
 
         this.socket.emit('message', JSON.stringify(message));
 
-        let msgs = this.state.messages;
-        msgs.push(message);
-        this.setState({messages : msgs, input : ''});
+        // let msgs = this.state.messages;
+        // msgs.push(message);
+        this.setState({input : ''});
+        this.getMessages(this.state.currentChannel);
         window.scrollTo(0,document.body.scrollHeight);
     };
 
@@ -190,6 +200,14 @@ class Chat extends React.Component {
         });
 
     componentDidUpdate = () => {
+        if(window.localStorage.getItem('ChatToken')==null){
+            this.props.history.push({
+                pathname: '/login',
+                state : {
+                    username: ''
+                }
+            });
+        }
     };
 
     addChannel = (form) => {
@@ -198,10 +216,31 @@ class Chat extends React.Component {
         this.setState({currentChannel : form.target.input.value});
     };
 
+    handleDelete = (value) => {
+      value.preventDefault();
+      console.log(value.target.messageID.value);
+      this.socket.emit('deleteMessage', value.target.messageID.value);
+    };
+
+    logout = (e) => {
+        e.preventDefault();
+        window.localStorage.setItem('ChatToken',null);
+        //navigate to chat page
+        this.props.history.push({
+            pathname: '/login',
+            state : {
+                username: ''
+            }
+        });
+    }
+
     render(){
         return (
                 <div className="chatApp">
                     <div className="leftPane">
+                        <a href="#" onClick={this.logout}>
+                            <p>Logout</p>
+                        </a>
                         <ChannelList
                             channels = {this.state.channels}
                             user = {this.state.username}
@@ -215,6 +254,8 @@ class Chat extends React.Component {
                         <MessageList
                             channel = {this.state.currentChannel}
                             messages = {this.state.messages}
+                            handleDelete = {this.handleDelete}
+                            username = {this.state.username}
                         />
                         <div className="inputArea">
                             <form onSubmit={this.sendMessage}>

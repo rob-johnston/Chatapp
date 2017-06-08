@@ -11,12 +11,16 @@ module.exports = function(io,ioJwt){
     //describing what to do on socket actions
     io.on('connection', function(socket){
 
-        console.log("a user connected");
         socket.on('disconnect',function(){
             console.log("user disconnected");
         });
 
         socket.on('message', function(msg){
+
+            Object.keys(io.sockets.connected).forEach(function(socket) {
+                console.log(io.sockets.connected[socket].decoded_token.username); // socketId
+            });
+
             let parsedMsg = JSON.parse(msg);
             let messageToSave = new models.Message(parsedMsg);
             messageToSave.save().then((e) => {
@@ -30,9 +34,7 @@ module.exports = function(io,ioJwt){
 
 
         socket.on('joinRoom',function(room){
-            console.log("join room socket received");
             let info = JSON.parse(room);
-            console.log(info);
             socket.join(info.room);
             socket.emit('joinedNewRoom', room);
 
@@ -42,18 +44,15 @@ module.exports = function(io,ioJwt){
                     user.addChannel(info.room);
                     return user.save()
                 })
-                .then((result)=>{
-                    console.log(result);
-                })
                 .catch((err) => {
                     console.log(err);
-                })
+                });
 
-            //create new Channel in DB
+            //create new Channel in DB - catch error if already exists
             let newChannel = new models.Channel({name : info.room});
             newChannel.save()
                 .catch((err) =>{
-                    console.log(err);
+                    console.log('Channel Exists');
                 });
 
 
@@ -62,7 +61,41 @@ module.exports = function(io,ioJwt){
         socket.on('leaveRoom',function (room) {
             socket.leave(room);
             //remove from models
-        })
+        });
+
+        socket.on('deleteMessage', function(messageID){
+
+            models.Message.findOne({_id : messageID})
+                .then((msg) => {
+                    if (msg.user === socket.decoded_token.username){
+                        return;
+                    }
+                });
+
+
+            console.log('delete message socket call');
+            models.Message.findOneAndRemove({_id : messageID})
+                .then((removed) =>{
+                    console.log(removed);
+                    io.in(removed.channel).emit('updateMessages', removed.channel);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        });
+
+        socket.on('editMessage', function(messageID){
+            models.Message.findOne({_id : messageID, username : socket.decoded_token.username})
+                .then((msg) => {
+                    //edit message
+
+                    //save message
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        });
+
 
 
 

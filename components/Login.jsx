@@ -49,8 +49,10 @@ class Login extends React.Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            console.log(responseJson);
-
+            if(responseJson.error){
+                this.setState({errorState: true});
+                return;
+            }
             //if successful assign user and token
             window.localStorage.setItem('ChatToken', responseJson.token);
 
@@ -61,11 +63,6 @@ class Login extends React.Component {
                     user: responseJson.user
                 }
             });
-        })
-        .catch((err) => {
-        //change error state, username or password dont match
-            console.log(err);
-            this.errorState=false;
         });
 
 
@@ -80,6 +77,7 @@ class Login extends React.Component {
                         value={this.username}
                         label="Username"
                         onChange={this.onChangeUsername}
+                        errorText={this.state.errorState && 'Error logging in'}
                         />
                     <TextField
                         type="password"

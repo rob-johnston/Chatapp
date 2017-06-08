@@ -46,16 +46,23 @@ class Register extends React.Component {
         })
         .then((response) => response.json())
         .then((responseJson) => {
-            console.log(responseJson);
-            //if successful save user and web token,
-            //the same as a normal login really
 
-        })
-        .catch((err) => {
-            //change error state, display already in use
-            console.log(err);
+        console.log(responseJson);
+            if(responseJson.error){
+                this.setState({errorState: true});
+                return;
+            }
+            //if successful assign user and token
+            window.localStorage.setItem('ChatToken', responseJson.token);
+
+            //navigate to chat page
+            this.props.history.push({
+                pathname: '/chat',
+                state : {
+                    user: responseJson.user
+                }
+            });
         });
-
 
 
     render() {
@@ -68,6 +75,7 @@ class Register extends React.Component {
                         value={this.username}
                         label="Username"
                         onChange={this.onChangeUsername}
+                        errorText={this.state.errorState && 'Name already in use'}
                     />
                     <TextField
                         type="password"
@@ -79,7 +87,6 @@ class Register extends React.Component {
                         type="submit"
                         label="register"
                     />
-
                 </form>
                 <p>already a member? Then<Link to="/login"> go to Login page </Link></p>
             </div>

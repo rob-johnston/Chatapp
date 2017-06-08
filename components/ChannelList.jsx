@@ -18,9 +18,13 @@ class ChannelList extends React.Component {
             let channels = this.state.channels;
             channels.push(e.target.input.value);
             this.setState({channels:channels});
+
+            if(e.target.input.value.length>0){
+                this.props.addChannel(e);
+                this.setState({input: ''});
+            }
+
         }
-        this.props.addChannel(e);
-        this.setState({input: ''});
     };
 
     renderChannelList = () => this.props.channels.map((channel,index) => {
