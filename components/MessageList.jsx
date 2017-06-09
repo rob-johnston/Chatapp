@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import FlatButton from 'material-ui/FlatButton';
+import IconButton from 'material-ui/IconButton';
 
 class MessageList extends React.Component {
 
@@ -19,12 +19,12 @@ class MessageList extends React.Component {
     deleteButton = (message) => {
         if(this.props.username == message.user){
             return (
-                <div>
+                <div className="deleteButton">
                     <form onSubmit={this.props.handleDelete} >
                         <input name ='messageID' type="hidden" value={message._id || ''}/>
-                        <FlatButton
+                        <IconButton
                             type="submit"
-                            label="-"
+                            iconClassName="fa fa-times fa-lg"
                         />
                     </form>
                 </div>

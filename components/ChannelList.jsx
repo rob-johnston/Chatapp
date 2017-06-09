@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import Styles from 'material-ui/styles/colors'
 
 class ChannelList extends React.Component {
 

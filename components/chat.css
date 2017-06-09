@@ -41,6 +41,7 @@ a{
 .channelListHeaderButton{
     margin-left:10px;
     float: left;
+    color: #90658e;
 }
 
 
@@ -84,10 +85,22 @@ a{
     background: #ececec;
 }
 
+.deleteButton{
+    display:none;
+}
+
+.individualMessage:hover .deleteButton {
+  display: inline-block;
+}
 
 .individualMessage {
     max-width: 80%;
     background: white;
+}
+
+.individualMessage:hover {
+    max-width: 80%;
+    background: #f8f8f8;
 }
 
 .individualMessage .messageText {
@@ -116,8 +129,8 @@ a{
 
 .individualUserSelected {
     background: teal;
-    color : white;
-    width : 90%;
+    color : #ffffff;
+    width : 100%;
 }
 .individualUserSelected a{
     color : white;
